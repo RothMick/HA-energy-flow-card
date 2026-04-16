@@ -1,4 +1,4 @@
-// energy-flow-card.js  v1.18.2
+// energy-flow-card.js  v1.19.0
 
 // Constants
 const PILL_POSITIONS=[
@@ -296,7 +296,7 @@ class EnergyFlowCardEditor extends HTMLElement {
       gsForm.schema=this._gsSchema();
       gsForm.data={minmax_min_width:this._cfg.minmax_min_width||''};
       gsForm.computeLabel=s=>s.label??s.name;
-      const GS_TEXT=new Set(['minmax_min_width']);
+      const GS_TEXT=new Set(['minmax_min_width','flow_height','gradient_day','gradient_night']);
       let gsPending=null;
       const gsFlush=()=>{
         if(!gsPending) return;
@@ -555,7 +555,10 @@ class EnergyFlowCardEditor extends HTMLElement {
 
   _gsSchema(){
     return[
-      {name:'minmax_min_width',label:'Grid Breakpoint (e.g. 175px)',selector:{text:{}}},
+      {name:'minmax_min_width',label:'Grid Breakpoint (e.g. 175px)',                                              selector:{text:{}}},
+      {name:'flow_height',     label:'Flow Area Height (e.g. 265px)',                                             selector:{text:{}}},
+      {name:'gradient_day',    label:'Background Gradient Day (e.g. linear-gradient(to bottom,#2A75F6 0%,...))',  selector:{text:{}}},
+      {name:'gradient_night',  label:'Background Gradient Night (e.g. linear-gradient(to bottom,#0A1929 0%,...))',selector:{text:{}}},
     ];
   }
 
@@ -715,8 +718,8 @@ class EnergyFlowCard extends HTMLElement {
     if(bg&&bg.getAttribute('src')!==src) bg.setAttribute('src',src);
     const card=sd.getElementById('card');
     if(card) card.style.background=n
-      ?'linear-gradient(to bottom,#0A1929 0%,#1A2332 67%,#2C3440 100%)'
-      :'linear-gradient(to bottom,#2A75F6 0%,#FFFFFF 67%,#D5D5D5 100%)';
+      ?(this._cfg.gradient_night||'linear-gradient(to bottom,#0A1929 0%,#1A2332 67%,#2C3440 100%)')
+      :(this._cfg.gradient_day  ||'linear-gradient(to bottom,#2A75F6 0%,#FFFFFF 67%,#D5D5D5 100%)');
 
     // Energy values: pills + animations
     const ev=this._getEnergyValues();
@@ -790,11 +793,12 @@ class EnergyFlowCard extends HTMLElement {
 
   _css(){
     const minW=this._cfg.minmax_min_width||'175px';
+    const fh=this._cfg.flow_height||'265px';
     return(
     ':host{display:block;}'+
     'ha-card{overflow:hidden;border-radius:16px;padding:0;border:none;box-shadow:none;transition:background 1s ease;}'+
     '.wrap{width:100%;}'+
-    '.flow{position:relative;width:100%;height:265px;overflow:hidden;}'+
+    '.flow{position:relative;width:100%;height:'+fh+';overflow:hidden;}'+
     '.bg{position:absolute;inset:10px 15px 5px 15px;width:calc(100% - 30px);height:calc(100% - 15px);object-fit:contain;}'+
     '.lines{position:absolute;inset:10px 15px 5px 15px;width:calc(100% - 30px);height:calc(100% - 15px);}'+
     '.pills{position:absolute;inset:0;pointer-events:none;z-index:2;}'+
@@ -817,4 +821,4 @@ class EnergyFlowCard extends HTMLElement {
 customElements.define('energy-flow-card',EnergyFlowCard);
 window.customCards=window.customCards||[];
 window.customCards.push({type:'energy-flow-card',name:'Energy Flow Card',description:'Animated energy flow with configurable energy value pills'});
-console.info('%c ENERGY-FLOW-CARD %c v1.18.2','background:#1976d2;color:#fff;padding:2px 4px;border-radius:3px 0 0 3px','background:#333;color:#fff;padding:2px 4px;border-radius:0 3px 3px 0');
+console.info('%c ENERGY-FLOW-CARD %c v1.19.0','background:#1976d2;color:#fff;padding:2px 4px;border-radius:3px 0 0 3px','background:#333;color:#fff;padding:2px 4px;border-radius:0 3px 3px 0');

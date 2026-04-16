@@ -34,7 +34,7 @@ A custom Home Assistant Lovelace card that displays an animated energy flow over
 
 1. Copy `energy-flow-card.js`, `isometric.svg` and `isometric_night.svg` into `/config/www/energyflow/` on your Home Assistant instance
 2. Go to **Settings → Dashboards → ⋮ → Resources → Add**
-3. Set URL to `/local/energyflow/energy-flow-card.js?v=1.18.0` and type to **JavaScript module**
+3. Set URL to `/local/energyflow/energy-flow-card.js?v=1.19.0` and type to **JavaScript module**
 4. Reload your browser
 
 ---
@@ -153,6 +153,9 @@ daily_entities:
 | `energy_values` | list | `[]` | Animated energy pills (see below) |
 | `daily_entities` | list | `[]` | Daily total values shown below the SVG (see below) |
 | `minmax_min_width` | string | `175px` | Minimum tile width before the grid collapses from 2 columns to 1 (e.g. `175px`, `200px`, `50%`) |
+| `flow_height` | string | `265px` | Height of the SVG flow area (e.g. `265px`, `300px`) |
+| `gradient_day` | string | `linear-gradient(to bottom,#2A75F6 0%,#FFFFFF 67%,#D5D5D5 100%)` | CSS background gradient for day mode |
+| `gradient_night` | string | `linear-gradient(to bottom,#0A1929 0%,#1A2332 67%,#2C3440 100%)` | CSS background gradient for night mode |
 
 ### `energy_values` entry
 
