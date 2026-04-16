@@ -1,4 +1,4 @@
-// energy-flow-card.js  v1.19.4
+// energy-flow-card.js  v1.19.5
 
 // Constants
 const PILL_POSITIONS=[
@@ -103,14 +103,16 @@ class EnergyFlowCardEditor extends HTMLElement {
     // ── Daily Entities list ──
     const dailyEntities=this._cfg.daily_entities||[];
     const deRows=dailyEntities.map((e,i)=>{
-      const icon=e.icon||(this._hass?.states[e.entity]?.attributes?.icon)||'mdi:circle';
       const color=e.color||'';
       const stObj=this._hass?.states[e.entity];
       const name=e.label||(stObj?.attributes?.friendly_name)||e.entity||'…';
       const sub=e.entity||'';
+      const iconEl=e.icon
+        ?`<ha-icon icon="${this._esc(e.icon)}" style="color:${this._esc(color)};--mdc-icon-size:24px;flex-shrink:0;margin:0 2px"></ha-icon>`
+        :`<ha-state-icon id="dei-${i}" style="color:${this._esc(color)};--mdc-icon-size:24px;flex-shrink:0;margin:0 2px"></ha-state-icon>`;
       return`<div class="erow" data-idx="${i}">
         <div class="handle"><ha-icon icon="mdi:drag-horizontal-variant"></ha-icon></div>
-        <ha-icon icon="${this._esc(icon)}" style="color:${this._esc(color)};--mdc-icon-size:24px;flex-shrink:0;margin:0 2px"></ha-icon>
+        ${iconEl}
         <div class="einfo">
           <span class="ename">${this._esc(name)}</span>
           <span class="esub">${this._esc(sub)}</span>
@@ -147,6 +149,12 @@ class EnergyFlowCardEditor extends HTMLElement {
           <ha-form id="gsf"></ha-form>
         </div>
       </details>`;
+
+    // ── Daily Entities: set ha-state-icon properties ──
+    dailyEntities.forEach((e,i)=>{
+      const si=sd.getElementById('dei-'+i);
+      if(si){si.hass=this._hass;si.stateObj=this._hass?.states[e.entity]||null;}
+    });
 
     // ── Global settings form ──
     const form=sd.getElementById('gf');
@@ -686,12 +694,14 @@ class EnergyFlowCard extends HTMLElement {
   _dailyH(){
     const entities=this._getDailyEntities();
     const rows=entities.map((e,i)=>{
-      const icon=e.icon||(this._hass?.states[e.entity]?.attributes?.icon)||'mdi:circle';
       const label=e.label||e.entity||'';
       const color=e.color||'';
       const showSub=!!e.secondary_entity;
       const col2=e.col_span==='2-col';
       const vid='de-'+i, sid='ds-'+i;
+      const iconEl=e.icon
+        ?'<ha-icon icon="'+e.icon+'" style="--mdc-icon-size:22px;color:'+color+';flex-shrink:0"></ha-icon>'
+        :'<ha-state-icon id="di-'+i+'" style="--mdc-icon-size:22px;color:'+color+';flex-shrink:0"></ha-state-icon>';
       let inner;
       if(showSub){
         const pre=e.secondary_icon
@@ -705,7 +715,7 @@ class EnergyFlowCard extends HTMLElement {
         inner='<span class="ev" id="'+vid+'">\u2013</span>';
       }
       return'<div class="ep"'+(col2?' style="grid-column:1/-1"':'')+'>'+
-        '<ha-icon icon="'+icon+'" style="--mdc-icon-size:22px;color:'+color+';flex-shrink:0"></ha-icon>'+
+        iconEl+
         '<div class="ed"><span class="el">'+label+'</span>'+inner+'</div></div>';
     }).join('');
     const oneColCount=entities.filter(e=>e.col_span!=='2-col').length;
@@ -772,6 +782,10 @@ class EnergyFlowCard extends HTMLElement {
           const formatted=isFloat?num.toFixed(2)+(su?' '+su:''):raw+(su?' '+su:'');
           this._set('ds-'+i,formatted);
         }
+        if(!e.icon){
+          const si=sd.getElementById('di-'+i);
+          if(si){si.hass=this._hass;si.stateObj=this._hass?.states[e.entity]||null;}
+        }
       });
     }
   }
@@ -825,4 +839,4 @@ class EnergyFlowCard extends HTMLElement {
 customElements.define('energy-flow-card',EnergyFlowCard);
 window.customCards=window.customCards||[];
 window.customCards.push({type:'energy-flow-card',name:'Energy Flow Card',description:'Animated energy flow with configurable energy value pills'});
-console.info('%c ENERGY-FLOW-CARD %c v1.19.4','background:#1976d2;color:#fff;padding:2px 4px;border-radius:3px 0 0 3px','background:#333;color:#fff;padding:2px 4px;border-radius:0 3px 3px 0');
+console.info('%c ENERGY-FLOW-CARD %c v1.19.5','background:#1976d2;color:#fff;padding:2px 4px;border-radius:3px 0 0 3px','background:#333;color:#fff;padding:2px 4px;border-radius:0 3px 3px 0');
