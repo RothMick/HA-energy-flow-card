@@ -4,6 +4,7 @@ A custom Home Assistant Lovelace card that displays an animated energy flow over
 
 <img width="1090" height="468" alt="preview" src="https://github.com/user-attachments/assets/750df14f-44b0-4750-b282-6887e4cdd46a" />
 
+<a href="[buymeacoffee.com/RothMick](https://buymeacoffee.com/rothmick)"><img width="217" height="50" alt="default-orange" src="https://github.com/user-attachments/assets/0da5dedd-5879-4b2a-9131-cd0ebd751547" /></a>
 
 ## Features
 
@@ -14,8 +15,6 @@ A custom Home Assistant Lovelace card that displays an animated energy flow over
 - Fully configurable via the visual editor (no YAML required)
 - Touch-compatible drag & drop sorting in the editor
 - YAML editor fallback per entry
-
-<a href="[buymeacoffee.com/RothMick](https://buymeacoffee.com/rothmick)"><img width="217" height="50" alt="default-orange" src="https://github.com/user-attachments/assets/0da5dedd-5879-4b2a-9131-cd0ebd751547" /></a>
 
 ---
 
