@@ -1,4 +1,4 @@
-// energy-flow-card.js  v1.18.0
+// energy-flow-card.js  v1.18.1
 
 // Constants
 const PILL_POSITIONS=[
@@ -519,7 +519,7 @@ class EnergyFlowCardEditor extends HTMLElement {
       {name:'position', label:'Position', required:true, selector:{select:{options:
         PILL_POSITIONS.map(p=>({value:p.value,label:p.label,disabled:p.value!==currentPos&&usedPositions.includes(p.value)}))
       }}},
-      {name:'label', label:'Label', selector:{text:{}}},
+      {name:'label', selector:{entity_name:{}}, context:{entity:'entity'}},
     ];
   }
   _evSchemaPos(){
@@ -817,4 +817,4 @@ class EnergyFlowCard extends HTMLElement {
 customElements.define('energy-flow-card',EnergyFlowCard);
 window.customCards=window.customCards||[];
 window.customCards.push({type:'energy-flow-card',name:'Energy Flow Card',description:'Animated energy flow with configurable energy value pills'});
-console.info('%c ENERGY-FLOW-CARD %c v1.18.0','background:#1976d2;color:#fff;padding:2px 4px;border-radius:3px 0 0 3px','background:#333;color:#fff;padding:2px 4px;border-radius:0 3px 3px 0');
+console.info('%c ENERGY-FLOW-CARD %c v1.18.1','background:#1976d2;color:#fff;padding:2px 4px;border-radius:3px 0 0 3px','background:#333;color:#fff;padding:2px 4px;border-radius:0 3px 3px 0');
