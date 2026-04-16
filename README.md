@@ -10,7 +10,9 @@ A custom Home Assistant Lovelace card that displays an animated energy flow over
 
 - Animated SVG flow lines per energy source (positive & negative direction)
 - Up to 8 configurable energy value pills in a 3×3 grid
-- Up to 10 daily entity values with optional secondary entity (1-col or 2-col)
+- Up to 10 daily entity values with optional secondary entity
+- Per-entity column width: half width (1-col) or full tile width (2-col)
+- Configurable grid breakpoint that controls the 2-column → 1-column layout switch
 - Day/night SVG backgrounds with auto-switching via sun entity
 - Fully configurable via the visual editor (no YAML required)
 - Touch-compatible drag & drop sorting in the editor
@@ -32,7 +34,7 @@ A custom Home Assistant Lovelace card that displays an animated energy flow over
 
 1. Copy `energy-flow-card.js`, `isometric.svg` and `isometric_night.svg` into `/config/www/energyflow/` on your Home Assistant instance
 2. Go to **Settings → Dashboards → ⋮ → Resources → Add**
-3. Set URL to `/local/energyflow/energy-flow-card.js?v=1.16.5` and type to **JavaScript module**
+3. Set URL to `/local/energyflow/energy-flow-card.js?v=1.17.0` and type to **JavaScript module**
 4. Reload your browser
 
 ---
@@ -58,6 +60,7 @@ daily_entities: []
 type: custom:energy-flow-card
 svg_day: /local/energyflow/isometric.svg
 svg_night: /local/energyflow/isometric_night.svg
+minmax_min_width: 175px
 entity_grid: sensor.house_power_curr
 entity_solar: sensor.curent_solar_production
 entity_battery: sensor.curent_battery_production
@@ -132,6 +135,7 @@ daily_entities:
     icon: ios:battery-50percent
     color: "#97EA63"
     secondary_entity: sensor.awtrix_5686f0_battery
+    col_span: 2-col
 ```
 
 ---
@@ -148,6 +152,7 @@ daily_entities:
 | `entity_sun` | entity | | Any entity whose state is `below_horizon` for night detection |
 | `energy_values` | list | `[]` | Animated energy pills (see below) |
 | `daily_entities` | list | `[]` | Daily total values shown below the SVG (see below) |
+| `minmax_min_width` | string | `175px` | Minimum tile width before the grid collapses from 2 columns to 1 (e.g. `175px`, `200px`, `50%`) |
 
 ### `energy_values` entry
 
@@ -174,6 +179,7 @@ daily_entities:
 | `secondary_entity` | entity | Optional second value shown small beside the main value |
 | `secondary_icon` | string | Icon for the secondary value |
 | `secondary_no_unit` | boolean | Hide the unit of the secondary value |
+| `col_span` | `1-col` / `2-col` | `1-col` | `1-col` places the tile in one grid column; `2-col` stretches it across the full card width |
 
 ---
 
