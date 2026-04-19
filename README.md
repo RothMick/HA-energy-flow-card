@@ -200,6 +200,24 @@ daily_entities:
 
 ---
 
+## Example configurations (`gh/` folder)
+
+The [`gh/`](gh/) folder contains ready-to-use SVG backgrounds and a matching `EXAMPLE_CONFIG.md` for a generic isometric house. Different variants cover common setups:
+
+| File | Description |
+|---|---|
+| `gh_solar_nogarage.svg` / `gh_solar_nogarage_battery.svg` | House with solar, no garage, optional battery |
+| `gh_solar_garage.svg` / `gh_solar_garage_closed.svg` | House with solar and garage (open / closed door) |
+| `gh_car.svg` / `gh_car_battery.svg` | House with car charger, optional battery |
+| `gh_solar_car.svg` / `gh_solar_car_battery.svg` | House with solar, car charger, optional battery |
+| `gh_bk_car.svg` / `gh_bk2_car.svg` / `gh_bk2_car_battery.svg` | Variants with balcony power station (BK) and car charger |
+| `gh_bk_garage_battery.svg` / `gh_bk_garage_closed_battery.svg` | BK variant with garage and battery |
+| `gh_bk_nogarage.svg` / `gh_bk_nogarage_battery.svg` | BK variant without garage, optional battery |
+
+The [`gh/EXAMPLE_CONFIG.md`](gh/EXAMPLE_CONFIG.md) contains the corresponding `energy_values` path definitions (SVG strokes, colors, positions) for this house layout.
+
+---
+
 ## SVG paths
 
 The flow animation follows SVG `path` elements. To get the correct paths for your own SVG:
