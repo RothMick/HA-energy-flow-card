@@ -37,7 +37,7 @@ A custom Home Assistant Lovelace card that displays an animated energy flow over
 
 1. Copy `energy-flow-card.js`, `isometric.svg` and `isometric_night.svg` into `/config/www/energyflow/` on your Home Assistant instance
 2. Go to **Settings → Dashboards → ⋮ → Resources → Add**
-3. Set URL to `/local/energyflow/energy-flow-card.js?v=1.20.0` and type to **JavaScript module**
+3. Set URL to `/local/energyflow/energy-flow-card.js?v=1.20.1` and type to **JavaScript module**
 4. Reload your browser
 5. Use settings from example below to start
 
@@ -197,6 +197,7 @@ daily_entities:
 | `gradient_night` | string | `linear-gradient(to bottom,#0A1929 0%,#1A2332 67%,#2C3440 100%)` | CSS background gradient for night mode |
 | `viewbox_width` | string | `1676` | SVG viewBox width — change when using a custom SVG with different dimensions. |
 | `viewbox_height` | string | `2058` | SVG viewBox height — change when using a custom SVG with different dimensions |
+| `animation_pause` | string | `3.5s` | Total animation cycle length (comet + pause). Higher values = longer pause between loops (e.g. `1s`, `3.5s`, `5s`) |
 
 ---
 
@@ -317,6 +318,19 @@ If your source path contains multiple subpaths, split them into individual `<pat
 
 <img width="935" height="450" alt="example" src="https://github.com/user-attachments/assets/b3548709-04ed-4910-8284-9a71e33dbef9" />
 
+
+---
+
+## Changelog
+
+### v1.20.1
+- **New: Animation Duration setting** — configurable cycle length via `animation_pause` in General Settings (default: `3.5s`). Controls the total duration including the pause between loops; comet speed stays constant.
+- **Performance: Entity change detection** — `_upd()` now only runs when a card-relevant entity state actually changes, instead of on every Home Assistant state update across the instance.
+- **Performance: Day/night guard** — background color and pill styles are only recalculated on an actual day/night transition.
+- **Performance: Icon update guard** — `ha-state-icon` only receives new values when the underlying state object reference changes.
+- **Performance: Style-tag guard** — animation CSS is only written to the DOM when the content has changed.
+- **Visual: Removed `backdrop-filter: blur()`** from pills — eliminates an expensive compositing layer on Safari/iOS. Pills are now opaque.
+- **Visual: Removed background transition** — day/night background switches instantly instead of animating over 1 second.
 
 ---
 

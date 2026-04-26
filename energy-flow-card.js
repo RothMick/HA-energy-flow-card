@@ -1,4 +1,4 @@
-// energy-flow-card.js  v1.20.0
+// energy-flow-card.js  v1.20.1
 
 // Constants
 const PILL_POSITIONS=[
@@ -318,6 +318,7 @@ class EnergyFlowCardEditor extends HTMLElement {
         gradient_night:  this._cfg.gradient_night  ||'linear-gradient(to bottom,#0A1929 0%,#1A2332 67%,#2C3440 100%)',
         viewbox_width:   this._cfg.viewbox_width   ||'1676',
         viewbox_height:  this._cfg.viewbox_height  ||'2058',
+        animation_pause: this._cfg.animation_pause ||'3.5s',
       };
       gsForm.computeLabel=s=>s.label??s.name;
 
@@ -578,6 +579,7 @@ class EnergyFlowCardEditor extends HTMLElement {
       {name:'gradient_night',  label:'Background Gradient Night (e.g. linear-gradient(to bottom,#0A1929 0%,...))',selector:{text:{}}},
       {name:'viewbox_width',   label:'SVG ViewBox Width (e.g. 1676)',                                             selector:{text:{}}},
       {name:'viewbox_height',  label:'SVG ViewBox Height (e.g. 2058)',                                            selector:{text:{}}},
+      {name:'animation_pause', label:'Animation Duration (e.g. 3.5s)',                                           selector:{text:{}}},
     ];
   }
 
@@ -628,9 +630,22 @@ class EnergyFlowCard extends HTMLElement {
   constructor(){
     super();this.attachShadow({mode:'open'});
     this._cfg={};this._hass=null;this._ok=false;
+    this._prevStates=null;this._lastNight=undefined;this._prevStateObjs={};
   }
-  setConfig(c){this._cfg=c;this._ok=false;this._build();}
-  set hass(h){this._hass=h;if(this._ok)this._upd();}
+  setConfig(c){this._cfg=c;this._ok=false;this._prevStates=null;this._lastNight=undefined;this._prevStateObjs={};this._build();}
+  set hass(h){this._hass=h;if(this._ok&&this._hasRelevantChange())this._upd();}
+  _hasRelevantChange(){
+    const h=this._hass,c=this._cfg;
+    const eids=[];
+    if(c.entity_sun)eids.push(c.entity_sun);
+    (c.energy_values||[]).forEach(e=>{if(e.entity)eids.push(e.entity);});
+    (c.daily_entities||[]).forEach(e=>{if(e.entity)eids.push(e.entity);if(e.secondary_entity)eids.push(e.secondary_entity);});
+    const prev=this._prevStates;
+    let changed=!prev;
+    if(prev){for(let j=0;j<eids.length;j++){if(h.states[eids[j]]?.state!==prev[eids[j]]){changed=true;break;}}}
+    if(changed){const ns={};eids.forEach(eid=>{ns[eid]=h.states[eid]?.state;});this._prevStates=ns;}
+    return changed;
+  }
   getCardSize(){return this._hasD()?8:5;}
 
   _hasD(){return(this._cfg.daily_entities||[]).length>0;}
@@ -746,6 +761,7 @@ class EnergyFlowCard extends HTMLElement {
     // Energy values: pills + animations
     const ev=this._getEnergyValues();
     const on=(v,t=15)=>Math.abs(v)>t;
+    const pause=Math.max(0,parseFloat(this._cfg.animation_pause||'3.5')||3.5);
     let animCss='';
 
     ev.forEach((e,i)=>{
@@ -764,7 +780,7 @@ class EnergyFlowCard extends HTMLElement {
       if(on(val)){
         const color=val>=0?e.color_positive:(e.color_negative||e.color_positive||'');
         const delay=val>=0?(e.delay_positive||''):(e.delay_negative||'');
-        animCss+=this._dot('lev'+i,color,'ev'+i,delay,dir);
+        animCss+=this._dot('lev'+i,color,'ev'+i,delay,dir,pause);
       }else{
         animCss+='.lines .lev'+i+' path{stroke:transparent;animation:none;}';
       }
@@ -776,7 +792,8 @@ class EnergyFlowCard extends HTMLElement {
     // Daily entities
     if(this._hasD()){
       const daily=sd.getElementById('daily');
-      if(daily){
+      if(daily&&n!==this._lastNight){
+        this._lastNight=n;
         daily.style.color=n?'white':'#1a1a1a';
         daily.querySelectorAll('.ep:not(.ep-sp)').forEach(ep=>{ep.style.background=n?'rgba(255,255,255,0.08)':'rgba(255,255,255,0.85)';});
       }
@@ -792,15 +809,23 @@ class EnergyFlowCard extends HTMLElement {
         }
         if(!e.icon){
           const si=sd.getElementById('di-'+i);
-          if(si){si.hass=this._hass;si.stateObj=this._hass?.states[e.entity]||null;}
+          if(si){
+            const stObj=this._hass?.states[e.entity]||null;
+            if(stObj!==this._prevStateObjs['di-'+i]){
+              si.hass=this._hass;si.stateObj=stObj;
+              this._prevStateObjs['di-'+i]=stObj;
+            }
+          }
         }
       });
     }
   }
 
-  _dot(cls,color,fid,delay,dir=''){
+  _dot(cls,color,fid,delay,dir='',pause=1){
     if(!color) return'.lines .'+cls+' path{stroke:transparent;animation:none;}';
-    const d=20,t=[200,300,400,480,560,640,720,800,880],gap=2000,tot=d+t[8]+gap,sp='3s',kf='kf'+cls.replace(/\W/g,'')+dir;
+    const speed=967,d=20,t=[200,300,400,480,560,640,720,800,880];
+    const gap=pause*speed,tot=d+t[8]+gap,sp=(tot/speed).toFixed(2)+'s';
+    const kf='kf'+cls.replace(/\W/g,'')+dir;
     const op=[.85,.7,.6,.5,.4,.3,.22,.15,.08],sw=[8.5,8,7.5,7,6.6,6,5.5,5,4.5];
     let r='@keyframes '+kf+'{to{stroke-dashoffset:'+tot+';}}';
     r+='.lines .'+cls+' .p0{stroke:'+color+';stroke-width:9;stroke-linecap:round;stroke-dasharray:'+d+' '+(tot-d)+';opacity:1;filter:url(#glow_'+fid+'_b);animation:'+kf+' '+sp+' linear infinite;animation-delay:'+delay+';}';
@@ -828,12 +853,12 @@ class EnergyFlowCard extends HTMLElement {
         '.lines{position:absolute;inset:10px 15px 5px 15px;width:calc(100% - 30px);height:calc(100% - 15px);}';
     return(
     ':host{display:block;}'+
-    'ha-card{overflow:hidden;border-radius:16px;padding:0;border:none;box-shadow:none;transition:background 1s ease;}'+
+    'ha-card{overflow:hidden;border-radius:16px;padding:0;border:none;box-shadow:none;}'+
     '.wrap{width:100%;}'+
     '.flow{position:relative;width:100%;height:'+fh+';overflow:hidden;}'+
     mediaStyle+
     '.pills{position:absolute;inset:0;pointer-events:none;z-index:2;}'+
-    '.pill{position:absolute;background:rgba(0,0,0,.35);backdrop-filter:blur(6px);border-radius:12px;padding:12px 14px;color:white;font-family:system-ui;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;}'+
+    '.pill{position:absolute;background:rgba(0,0,0,.35);border-radius:12px;padding:12px 14px;color:white;font-family:system-ui;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;}'+
     '.pill:hover{background:rgba(0,0,0,.55);}'+
     '.pill:active{background:rgba(0,0,0,.7);}'+
     '.pt{display:block;font-size:12px;opacity:.8;line-height:1.3;}'+
@@ -852,4 +877,4 @@ class EnergyFlowCard extends HTMLElement {
 customElements.define('energy-flow-card',EnergyFlowCard);
 window.customCards=window.customCards||[];
 window.customCards.push({type:'energy-flow-card',name:'Energy Flow Card',description:'Animated energy flow with configurable energy value pills'});
-console.info('%c ENERGY-FLOW-CARD %c v1.20.0','background:#1976d2;color:#fff;padding:2px 4px;border-radius:3px 0 0 3px','background:#333;color:#fff;padding:2px 4px;border-radius:0 3px 3px 0');
+console.info('%c ENERGY-FLOW-CARD %c v1.20.1','background:#1976d2;color:#fff;padding:2px 4px;border-radius:3px 0 0 3px','background:#333;color:#fff;padding:2px 4px;border-radius:0 3px 3px 0');
