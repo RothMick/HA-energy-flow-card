@@ -2,7 +2,9 @@
 
 A custom Home Assistant Lovelace card that displays an animated energy flow over a custom SVG background. Energy values are shown as configurable pills with animated flow lines, and daily totals are displayed in a grid below.
 
-<img width="400" height="380" alt="animation" src="https://github.com/user-attachments/assets/411ce819-53e1-41c4-95b4-193736ce7f06" />
+<img width="992" height="742" alt="Preview3" src="https://github.com/user-attachments/assets/42c1ef46-6764-4ece-beed-d40827449b7b" />
+
+<img width="976" height="742" alt="Preview3b" src="https://github.com/user-attachments/assets/f919f6a3-8608-401a-9eeb-7d1a2838c9bf" />
 
 ## Features
 
@@ -142,6 +144,8 @@ daily_entities:
     col_span: 2-col
 ```
 
+<img width="400" height="380" alt="animation" src="https://github.com/user-attachments/assets/411ce819-53e1-41c4-95b4-193736ce7f06" />
+
 ---
 
 ## Configuration options
@@ -216,12 +220,6 @@ The [`gh/`](gh/) folder contains ready-to-use SVG backgrounds and a matching `EX
 | `gh_bk_nogarage.svg` / `gh_bk_nogarage_battery.svg` | BK variant without garage, optional battery |
 
 The [`gh/EXAMPLE_CONFIG.md`](gh/EXAMPLE_CONFIG.md) contains the corresponding `energy_values` path definitions (SVG strokes, colors, positions) for this house layout.
-
-<img width="992" height="742" alt="Preview3" src="https://github.com/user-attachments/assets/42c1ef46-6764-4ece-beed-d40827449b7b" />
-
-nights set also available. Just add "_night".
-
-<img width="976" height="742" alt="Preview3b" src="https://github.com/user-attachments/assets/f919f6a3-8608-401a-9eeb-7d1a2838c9bf" />
 
 ---
 
